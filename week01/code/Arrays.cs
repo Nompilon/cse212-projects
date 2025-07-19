@@ -12,8 +12,19 @@ public static class Arrays
         // Remember: Using comments in your program, write down your process for solving this problem
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
+        // 1. Create an array of doubles of the specified length
+    double[] multiples = new double[length];
 
-        return []; // replace this return statement with your own
+    // 2. Loop through each index and assign the multiple value
+    for (int i = 0; i < length; i++)
+    {
+        multiples[i] = number * (i + 1);
+    }
+
+    // 3. Return the array
+    return multiples;
+
+       
     }
 
     /// <summary>
@@ -29,5 +40,14 @@ public static class Arrays
         // Remember: Using comments in your program, write down your process for solving this problem
         // step by step before you write the code. The plan should be clear enough that it could
         // be implemented by another person.
+
+        // 1. Extract the last 'amount' elements
+    var tail = data.GetRange(data.Count - amount, amount);
+
+    // 2. Remove those elements from the original list
+    data.RemoveRange(data.Count - amount, amount);
+
+    // 3. Insert extracted elements at the front
+    data.InsertRange(0, tail);
     }
 }
