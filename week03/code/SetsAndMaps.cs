@@ -1,3 +1,5 @@
+using System.Net.Http;
+using System.IO;
 using System.Text.Json;
 
 public static class SetsAndMaps
@@ -22,7 +24,33 @@ public static class SetsAndMaps
     public static string[] FindPairs(string[] words)
     {
         // TODO Problem 1 - ADD YOUR CODE HERE
-        return [];
+        HashSet<string> seen = new();       // Stores words we've seen
+    HashSet<string> results = new();    // Stores result pairs
+
+    foreach (var word in words)
+    {
+        if (word[0] == word[1])
+        {
+            // Skip symmetric words like "aa"
+            continue;
+        }
+
+        string reversed = new string(new[] { word[1], word[0] });
+
+        if (seen.Contains(reversed))
+        {
+            // Ensure pair is always stored in consistent order
+            string pair = string.Compare(word, reversed, StringComparison.Ordinal) < 0
+                ? $"{word} & {reversed}"
+                : $"{reversed} & {word}";
+
+            results.Add(pair);
+        }
+
+        seen.Add(word);
+    }
+
+        return results.ToArray();
     }
 
     /// <summary>
@@ -43,6 +71,19 @@ public static class SetsAndMaps
         {
             var fields = line.Split(",");
             // TODO Problem 2 - ADD YOUR CODE HERE
+            if (fields.Length >= 4)
+            {
+                string degree = fields[3].Trim();
+
+                if (degrees.ContainsKey(degree))
+                {
+                    degrees[degree]++;
+                }
+                else
+                {
+                    degrees[degree] = 1;
+                }
+            }
         }
 
         return degrees;
@@ -67,7 +108,38 @@ public static class SetsAndMaps
     public static bool IsAnagram(string word1, string word2)
     {
         // TODO Problem 3 - ADD YOUR CODE HERE
+
+        word1 = word1.Replace(" ", "").ToLower();
+        word2 = word2.Replace(" ", "").ToLower();
+        if (word1.Length != word2.Length)
         return false;
+
+    // Dictionary to count characters in word1
+    Dictionary<char, int> charCount = new();
+
+    foreach (char c in word1)
+    {
+        if (charCount.ContainsKey(c))
+            charCount[c]++;
+        else
+            charCount[c] = 1;
+    }
+
+    // Subtract the counts using word2
+    foreach (char c in word2)
+    {
+        if (!charCount.ContainsKey(c))
+            return false;
+
+        charCount[c]--;
+
+        if (charCount[c] < 0)
+            return false;
+    }
+
+    // All values should be 0 now if it's a true anagram
+    
+        return true;
     }
 
     /// <summary>
@@ -84,6 +156,8 @@ public static class SetsAndMaps
     /// https://earthquake.usgs.gov/earthquakes/feed/v1.0/geojson.php
     /// 
     /// </summary>
+    
+    
     public static string[] EarthquakeDailySummary()
     {
         const string uri = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_day.geojson";
@@ -101,6 +175,18 @@ public static class SetsAndMaps
         // on those classes so that the call to Deserialize above works properly.
         // 2. Add code below to create a string out each place a earthquake has happened today and its magitude.
         // 3. Return an array of these string descriptions.
-        return [];
+        if (featureCollection?.Features == null)
+            return [];
+
+        List<string> summary = new();
+        foreach (var feature in featureCollection.Features)
+        {
+            var place = feature.Properties.Place;
+            var mag = feature.Properties.Mag;
+
+            if (!string.IsNullOrWhiteSpace(place) && mag.HasValue)
+            summary.Add($"{place} - Magnitude {mag.Value:F1}");
+        }
+        return summary.ToArray();
     }
 }
